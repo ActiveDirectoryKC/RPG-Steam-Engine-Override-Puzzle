@@ -77,12 +77,7 @@ can choose to give a larger penalty by reducing the number of available attempts
 
 **Example:** Barbarian attempts to "Manually Release Pressure Valve" (DC 11),
 rolls a 7 (fails by 4 = Major Failure). Barbarian rolls d8 → gets a 3
-("Passenger Shout"). *Narrative: "As you wrench the valve, a terrified
-passenger lurches forward and grabs your arm, shrieking 'Are we going to
-die?!' You have to spend a moment reassuring them before you can work
-again."* No app interaction — the Barbarian's next action is to calm the
-passenger, wasting time but not costing an attempt.
-
+("Minor Fire").**DM rolls 1d6 (3) and damages the party. *Narrative: "As you wrench the valve, you slip and scrape metal throwing sparks on a puddle of grease on the floor. Flames lash out from the grease and scald everyone nearby."* 
 > Adjust to fit your campaign — this is meant as a starting point, not a
 > fixed rule.
 
