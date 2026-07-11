@@ -1,20 +1,49 @@
 # Steam Engine Override Interface
 
-A single-file, self-contained hacking/skill-challenge minigame built for D&D (or
-any TTRPG) — players work a bank of hex dial controls to find a hidden code
-while a steampunk engine status dashboard gives them "hot or cold" feedback on
-how close they are. No build step, no dependencies: open `steam-engine-override.html`
-in a browser and it runs.
+A single-file, self-contained puzzle/password guessing minigame built for any
+tabletop RPG. The goal is to provide a mechanism for the players to solve a
+puzzle collectively to prevent an exploding steam engine. No build step, no
+dependencies: open `steam-engine-override-puzzle.html` in a browser and it
+runs.
 
 Originally built as a train-decoupling / boiler-override encounter, but the
 mechanics are generic enough to reskin for any "enter the code while reading
 environmental feedback" scene.
 
+> **[AI DISCLOSURE]** This tool was entirely AI developed via guided prompts.
+> The prompt information is provided below. The inspiration is the typical
+> "lever pull" minigames from video games and playing "hotter-colder" with my
+> kids. I'm not a terribly great JavaScript programmer, hence my use of
+> Claude to generate the code.
+
+## General mechanics
+
+Players work with a bank of dials, each having 16 possible values (`0-9`,
+`A-F`), to find a hidden code that is set by the DM. Each time the players
+make a change and submit, one attempt is consumed and they are shown whether
+the system improved or got worse. The idea is the players play a game of
+hotter-colder to guess the password, which in effect decides whether they're
+able to save the steam engine.
+
+Along with each "lever pull" / submission, the players were asked to roll a
+DC20 INT check to assess their ability to work the system without issue.
+
+- **Failed INT check:** Use the chart below to determine consequence. Alter
+  according to your campaign.
+- **Success INT check:** No harm, and the players operate the system
+  successfully.
+- **Natural 1 (critical failure):** The players take a negative consequence
+  from the chart, and the DM also removes an attempt from the system using
+  the dashboard at the top.
+- **Natural 20 (critical success):** The players successfully manipulate the
+  system, and the DM can give them a boon — either a clue or bonus tries — at
+  their discretion.
+
 ## Quick start
 
-1. Open `steam-engine-override.html` in any modern browser (desktop or shared
-   screen works best — there's a DM-only panel at the top that shouldn't be
-   visible to players).
+1. Open `steam-engine-override-puzzle.html` in any modern browser (desktop or
+   shared screen works best — there's a DM-only panel at the top that
+   shouldn't be visible to players).
 2. In the **DM Control Panel**, set your own override code (see below) or
    leave the default in place.
 3. Share the screen with players, or drive it yourself while narrating.
@@ -34,6 +63,7 @@ Panel** at the top of the page. None of this is visible to players unless you
 choose to share it.
 
 ### Setting the override code
+
 - The code is 7 hex characters (`0-9`, `A-F`).
 - Type it into the masked **Override Code** field and hit **Set Code &
   Restart**. Use **Show/Hide** to check what you typed without it being
@@ -42,19 +72,31 @@ choose to share it.
   fresh state based on the new code.
 
 ### Rewards (1–3): revealing digits
+
 Three checkboxes let you hand players a confirmed correct digit as an
 in-fiction reward (passing a skill check, finding a maintenance log, etc.).
+
 They're fixed left-to-right: **Reward 1 reveals Position 0, Reward 2 reveals
 Position 2, Reward 3 reveals Position 5.** Checking one snaps that dial to
 the correct value and locks it (its ▲/▼ buttons disable) so it can't be
 accidentally bumped off afterward.
 
+For these checks I gave them an Investigation/Intelligence check to find
+clues. This was intended to be hard, to encourage guessing. You can adjust
+the DC accordingly.
+
+- Clue 1: DC20 check / natural 20 on a lever pull
+- Clue 2: DC22 check / natural 20 on a lever pull
+- Clue 3: DC24 check / natural 20 on a lever pull
+
 ### Reward 4: attempts adjustment
+
 A simple **−1 / +1** stepper that permanently nudges the attempts budget up
 or down, applied immediately (no restart needed). Use it for "the crew buys
 you time" or "that mistake cost you" moments.
 
 ### Override Decouple Warning
+
 A checkbox + editable number field. If your table decides to decouple the
 car rather than push through the override, check this box to add the field's
 value (default `+4`) to the attempts remaining. It's a plain number, so you
@@ -63,6 +105,7 @@ scene. This applies live and can pull the interface back from a failure
 state if you grant enough attempts to bring the count above zero.
 
 ### DM Reference panel
+
 Click **Show DM Reference** (in the main dial panel) to see, per position:
 the correct digit, the current dial value, which system it drives, and its
 live HOT/COLD/OPTIMUM read. This is meant to stay on your screen only —
@@ -70,6 +113,7 @@ players are never shown which dial affects which gauge (see **Design intent**
 below for why).
 
 ### Max Attempts
+
 Set the starting attempts budget (default 18) in the config row and hit
 **Apply & Restart**.
 
