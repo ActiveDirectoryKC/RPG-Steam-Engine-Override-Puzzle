@@ -16,6 +16,13 @@ environmental feedback" scene.
 > kids. I'm not a terribly great JavaScript programmer, hence my use of
 > Claude to generate the code.
 
+![STEAM ENGINE OVERRIDE PUZZLE - TOP](https://github.com/ActiveDirectoryKC/RPG-Steam-Engine-Override-Puzzle/blob/21edb78e460ed339c5730e9739402ef961064e2c/screenshots/RPG%20-%20STEAM%20ENGINE%20OVERLOAD%20PUZZLE%20-%20TOP.png)
+
+![STEAM ENGINE OVERRIDE PUZZLE - BOTTOM](https://github.com/ActiveDirectoryKC/RPG-Steam-Engine-Override-Puzzle/blob/21edb78e460ed339c5730e9739402ef961064e2c/screenshots/RPG%20-%20STEAM%20ENGINE%20OVERLOAD%20PUZZLE%20-%20BOTTOM.png)
+
+
+
+
 ## General mechanics
 
 Players work with a bank of dials, each having 16 possible values (`0-9`,
@@ -41,67 +48,21 @@ DC20 INT check to assess their ability to work the system without issue.
 
 ### Failed check consequence chart
 
-> Note: the original notes for this chart used per-gauge stat bumps (e.g.
-> "Pressure +1") as the web app effect. The app has no control for nudging a
-> specific gauge directly — gauges are only ever derived from the 7 dial
-> positions vs. the hidden solution, and the only DM-adjustable number is the
-> attempts budget (Reward 4's −1/+1 stepper, or the Decouple field). So the
-> effects below were redesigned around what the app can actually do: minor
-> and major failures are pure table narrative with no app interaction at all,
-> and critical failures are the only tier that costs an attempt, using the
-> same Reward 4 stepper described earlier. This keeps the chart consistent
-> with the existing Natural 1 rule (which already docks an attempt) rather
-> than introducing a second, conflicting way to touch the app.
-
-When a player fails **any** repair check, they roll based on failure margin.
-All consequences are inconvenient but survivable.
-
-#### Minor failure (failed by 1–2)
-
 Roll a d6. Pure narrative/mechanical flavor — no app interaction.
 
 | Roll | Consequence | Effect |
 |---|---|---|
 | 1 | Slipped Tool | Character drops their tool; uses their next action to retrieve it |
-| 2 | Steam Burn | Character takes 1d4 damage; minor wound (no mechanical penalty) |
-| 3 | Loud Noise | Alarming metallic screech; enemies nearby hear it (if applicable) |
+| 2 | Steam Vent | Character takes 2d4 damage and must move 5ft away|
+| 3 | Minor Fire | Small flames erupt; party takes 1d6 fire damage (no save) |
 | 4 | Grease Splatter | Character's hands slip; disadvantage on their next check this round |
 | 5 | Steam Pocket | Character coughs and sputters but recovers; wastes 6 seconds |
-| 6 | Vibration Jolt | Character staggers; no mechanical effect, just awkward |
-
-#### Major failure (failed by 3–5)
-
-Roll a d8. Still no app interaction — costs time, position, or a temporary
-penalty at the table, not attempts.
-
-| Roll | Consequence | Effect |
-|---|---|---|
-| 1 | Wrench Slips | Character loses their grip; −2 to next check if retrying same task |
-| 2 | Minor Fire | Small flames erupt; party takes 1d6 fire damage (no save) |
-| 3 | Passenger Shout | A frightened passenger grabs the character; must use action to shake them off |
-| 4 | Hissing Leak | Character's work location becomes harder to reach; next character gets disadvantage on that task |
-| 5 | Character Stumbles | Character is knocked prone; uses their next action to stand up |
 | 6 | Loud Bang | A component backfires; all party members within 20 ft. must make DC 12 DEX save or be startled (disadvantage on their next action) |
-| 7 | Tool Damage | Character's tool breaks; they need 1 round to grab a backup or improvise |
-| 8 | Steam Vent | Hot steam jets from an unexpected crack; character takes 2d4 damage and must move 5 ft. away |
 
 #### Critical failure (failed by 6+)
 
-Roll a d8. This is the only tier that touches the app — most results cost the
-party **1 attempt** (use Reward 4's −1 button), on top of the narrative
-effect. It stacks with a Natural 1's attempt loss if both happen to trigger
-on the same roll.
-
-| Roll | Consequence | Effect | Attempts Cost |
-|---|---|---|---|
-| 1 | Explosion (Minor) | Party takes 2d6 fire damage; character who failed takes double | −1 |
-| 2 | Cascading Malfunction | The broken component creates a chain reaction; next character to work on ANY task has disadvantage | −1 |
-| 3 | Passenger Injury | An unfortunate passenger is hurt in the chaos; character feels guilty (narrative tension only) | none |
-| 4 | Equipment Loss | Character's toolkit is knocked overboard or becomes unreachable; they're unarmed for repairs next round | −1 |
-| 5 | Fuel Spillage | Fuel leaks and pools; next character working on that section has disadvantage unless they use an action to mop it up | −1 |
-| 6 | Violent Shudder | Train lurches hard; DC 12 DEX save for all party or prone | −1 |
-| 7 | Broken Coupling | One train car rocks loose; passengers scream; character must use action to stabilize or lose 1 segment distance | −1 |
-| 8 | Pressure Spike | System overloads momentarily; character takes 3d4 damage and the whole cabin shudders | −2 |
+With critical failures the effect can be amplified at the DM's disgression or impose effects to adjacent/additional party members. Additionally the DM 
+can choose to give a larger penalty by reducing the number of available attempts by 1. 
 
 #### How it works at the table
 
@@ -141,12 +102,6 @@ passenger, wasting time but not costing an attempt.
 No installation, no server, no accounts. It's one HTML file — email it, drop
 it in a shared folder, or host it as a GitHub Pages page and it'll work the
 same way.
-
-### Screenshot
-
-![DM Control Panel, dials, and top of the status dashboard](screenshots/interface-top.png)
-
-![Full status dashboard with all seven gauges and the submit log](screenshots/interface-bottom.png)
 
 ## For the DM
 
