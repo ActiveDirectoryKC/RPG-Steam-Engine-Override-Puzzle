@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Steam Engine Override Interface</title>
+<style>
+  :root {
+    --iron: #1a1512;
+    --iron-2: #241d18;
+    --panel: #2b2119;
+    --rivet: #4a3a28;
+    --brass: #c9a227;
+    --brass-dim: #8a6f1f;
+    --copper: #b5651d;
+    --steam: #e8dcc8;
+    --steam-dim: #a89a82;
+    --green: #4a9060;
+    --yellow: #d4a72c;
+    --red: #c0392b;
+    --red-bright: #e84b3a;
+    --dm: #6a8caf;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(ellipse at top, #2a2015 0%, var(--iron) 60%);
+    color: var(--steam);
+    font-family: 'Courier New', 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+  h1, h2 { font-family: Georgia, 'Rockwell', 'Bitter', serif; letter-spacing: 0.04em; }
+  .frame {
+    max-width: 1040px;
+    margin: 0 auto;
+    border: 3px solid var(--rivet);
+    border-radius: 6px;
+    background: linear-gradient(180deg, var(--iron-2), var(--iron));
+    padding: 20px 24px 28px;
+    box-shadow: 0 0 0 1px #000, 0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.4);
+    position: relative;
+  }
+  .frame::before, .frame::after {
+    content: ""; position: absolute; width: 10px; height: 10px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #6b5738, #2b2119 70%); top: 10px;
+  }
+  .frame::before { left: 10px; }
+  .frame::after { right: 10px; }
+  header { text-align: center; border-bottom: 1px solid var(--rivet); padding-bottom: 14px; margin-bottom: 16px; }
+  header h1 { margin: 0; font-size: 1.7rem; color: var(--brass); text-shadow: 0 0 12px rgba(201,162,39,0.35); }
+  header .sub { color: var(--steam-dim); font-size: 0.8rem; margin-top: 4px; letter-spacing: 0.15em; text-transform: uppercase; }
+  .crisis-banner {
+    text-align: center; font-size: 0.78rem; color: var(--red-bright); letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 14px; animation: flicker 2.4s infinite;
+  }
+  @keyframes flicker { 0%,100%{opacity:1;} 50%{opacity:0.55;} }
+  .attempts-banner {
+    text-align: center; font-size: 1.6rem; font-weight: bold; padding: 10px;
+    border: 2px solid var(--brass-dim); border-radius: 4px; margin-bottom: 18px;
+    background: rgba(0,0,0,0.25); letter-spacing: 0.08em;
+  }
+  .attempts-banner.warn { color: var(--red-bright); border-color: var(--red); animation: pulse 1s infinite; }
+  .attempts-banner.ok { color: var(--brass); }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 6px rgba(232,75,58,0.2); } 50% { box-shadow: 0 0 18px rgba(232,75,58,0.6); } }
+  .config-row {
+    display: flex; justify-content: center; gap: 18px; margin-bottom: 18px;
+    font-size: 0.78rem; color: var(--steam-dim); flex-wrap: wrap;
+  }
+  .config-row label { display: flex; align-items: center; gap: 6px; }
+  .config-row input[type=number] {
+    width: 54px; background: var(--iron); border: 1px solid var(--rivet); color: var(--steam);
+    padding: 3px 6px; border-radius: 3px; font-family: inherit;
+  }
+  .config-row button {
+    font-family: inherit; background: none; border: 1px solid var(--rivet); color: var(--steam-dim);
+    border-radius: 3px; padding: 3px 8px; cursor: pointer;
+  }
+
+  .dm-panel {
+    border: 1px solid var(--dm);
+    background: rgba(106,140,175,0.08);
+    border-radius: 5px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+  }
+  .dm-panel h2 { color: var(--dm); }
+  .dm-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+  .dm-row label { font-size: 0.78rem; color: var(--steam-dim); }
+  .dm-row input[type=password], .dm-row input[type=text] {
+    background: var(--iron); border: 1px solid var(--dm); color: var(--steam);
+    padding: 6px 8px; border-radius: 3px; font-family: inherit; letter-spacing: 0.2em; width: 140px;
+    text-transform: uppercase;
+  }
+  .dm-row button {
+    font-family: inherit; background: var(--dm); border: none; color: #10161f;
+    border-radius: 3px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 0.75rem;
+  }
+  .dm-row .toggle-vis {
+    background: none; border: 1px solid var(--dm); color: var(--dm); padding: 5px 8px;
+  }
+  .dm-status { font-size: 0.72rem; color: var(--steam-dim); }
+  .reward-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+  .reward-row { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--steam-dim); }
+  .reward-row select {
+    background: var(--iron); border: 1px solid var(--rivet); color: var(--steam); border-radius: 3px;
+    font-family: inherit; padding: 3px 6px;
+  }
+
+  .main-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 22px; }
+  @media (max-width: 780px) { .main-grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--rivet); border-radius: 5px; padding: 16px; }
+  .panel h2 {
+    margin: 0 0 12px; font-size: 0.95rem; color: var(--brass); text-transform: uppercase;
+    letter-spacing: 0.12em; border-bottom: 1px solid var(--rivet); padding-bottom: 8px;
+  }
+  .dials { display: flex; justify-content: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .dial { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .dial-pos-label { font-size: 0.6rem; color: var(--steam-dim); letter-spacing: 0.1em; }
+  .dial button {
+    width: 34px; height: 22px;
+    background: linear-gradient(180deg, var(--copper), #7a3a10);
+    border: 1px solid #5c2c0d; color: var(--steam); cursor: pointer; font-family: inherit;
+    border-radius: 3px; font-size: 0.85rem; line-height: 1;
+  }
+  .dial button:active { filter: brightness(0.85); }
+  .dial button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .dial-value {
+    width: 40px; height: 44px; border: 1px solid var(--brass-dim); border-radius: 3px; background: var(--iron);
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--brass);
+    text-shadow: 0 0 8px rgba(201,162,39,0.3);
+  }
+  .dial-value.revealed { border-color: var(--green); color: var(--green); box-shadow: 0 0 8px rgba(74,144,96,0.4); }
+  .correct-count { text-align: center; color: var(--brass); font-size: 0.85rem; margin-bottom: 14px; letter-spacing: 0.08em; }
+  #submitBtn {
+    width: 100%; padding: 12px;
+    background: linear-gradient(180deg, var(--copper), #8a4415);
+    border: 1px solid #5c2c0d; color: var(--steam); font-family: inherit; font-weight: bold;
+    font-size: 0.95rem; letter-spacing: 0.1em; border-radius: 4px; cursor: pointer; text-transform: uppercase;
+  }
+  #submitBtn:hover:not(:disabled) { filter: brightness(1.15); }
+  #submitBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .log { margin-top: 14px; font-size: 0.75rem; color: var(--steam-dim); border-top: 1px solid var(--rivet); padding-top: 8px; }
+  .log div { padding: 2px 0; }
+  .log .bad { color: var(--red-bright); }
+  .log .good { color: var(--green); }
+  .gauge-row { display: grid; grid-template-columns: 118px 1fr 68px 24px; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .gauge-label { font-size: 0.75rem; color: var(--steam-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+  .gauge-track { height: 14px; background: var(--iron); border: 1px solid var(--rivet); border-radius: 7px; overflow: hidden; position: relative; }
+  .gauge-fill { height: 100%; transition: width 0.35s ease, background 0.35s ease; border-radius: 7px 0 0 7px; }
+  .gauge-value { font-size: 0.8rem; text-align: right; }
+  .gauge-dot { font-size: 0.9rem; text-align: center; }
+  .status-line { text-align: center; font-size: 0.78rem; color: var(--steam-dim); margin-top: 10px; border-top: 1px solid var(--rivet); padding-top: 10px; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.88); display: none;
+    align-items: center; justify-content: center; z-index: 50; text-align: center; padding: 20px;
+  }
+  .overlay.show { display: flex; }
+  .overlay .msg h2 { font-size: 2.4rem; margin-bottom: 10px; letter-spacing: 0.1em; }
+  .overlay.fail .msg h2 { color: var(--red-bright); text-shadow: 0 0 20px rgba(232,75,58,0.6); }
+  .overlay.win .msg h2 { color: var(--green); text-shadow: 0 0 20px rgba(74,144,96,0.6); }
+  .overlay .msg p { color: var(--steam-dim); margin-bottom: 20px; }
+  .overlay button { padding: 10px 22px; background: var(--brass); border: none; border-radius: 4px; font-family: inherit; font-weight: bold; cursor: pointer; }
+  .hint-toggle { text-align: center; margin-top: 10px; }
+  .hint-toggle button {
+    background: none; border: 1px solid var(--rivet); color: var(--steam-dim); padding: 4px 10px;
+    border-radius: 3px; font-size: 0.7rem; cursor: pointer; font-family: inherit;
+  }
+  #hintPanel { display: none; margin-top: 10px; font-size: 0.72rem; color: var(--steam-dim); line-height: 1.5; }
+  #hintPanel.show { display: block; }
+  #hintPanel table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  #hintPanel td, #hintPanel th { border: 1px solid var(--rivet); padding: 3px 5px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <header>
+    <h1>ENGINE OVERRIDE INTERFACE</h1>
+    <div class="sub">Boiler Deck &mdash; Emergency Manual Control</div>
+  </header>
+
+  <div class="dm-panel">
+    <h2>DM Control Panel</h2>
+    <div class="dm-row">
+      <label>Override Code (hex, 7 chars)</label>
+      <input type="password" id="dmCodeInput" maxlength="7" placeholder="•••••••">
+      <button class="toggle-vis" id="toggleVisBtn">Show</button>
+      <button id="setCodeBtn">Set Code &amp; Restart</button>
+    </div>
+    <div class="dm-status" id="dmStatus">Using default code. Set your own to steer the puzzle.</div>
+    <div class="dm-row" style="margin-top:10px;">
+      <label>Reward reveals (check off left to right as they're earned: Pos 0, then Pos 2, then Pos 5)</label>
+    </div>
+    <div class="reward-list" id="rewardList"></div>
+
+    <div class="dm-row" style="margin-top:14px;">
+      <label>Reward 4 &mdash; adjust Max Attempts</label>
+      <button id="reward4Down" style="padding:4px 12px;">&minus; 1</button>
+      <span id="reward4Value" style="min-width:60px;text-align:center;display:inline-block;color:var(--brass);">+0 attempts</span>
+      <button id="reward4Up" style="padding:4px 12px;">&plus; 1</button>
+    </div>
+
+    <div class="dm-row" style="margin-top:14px;">
+      <input type="checkbox" id="approachCk">
+      <label for="approachCk">Override Decouple Warning chosen &mdash; add</label>
+      <input type="number" id="approachField" value="4" style="width:56px;background:var(--iron);border:1px solid var(--dm);color:var(--steam);padding:5px 6px;border-radius:3px;font-family:inherit;text-align:center;">
+      <label for="approachField">to attempts remaining if checked</label>
+    </div>
+  </div>
+
+  <div class="crisis-banner">⚠ ENGINE ALREADY UNSTABLE &mdash; TRAIN CURRENTLY HEADING TOWARD FAILURE ⚠</div>
+
+  <div id="attemptsBanner" class="attempts-banner ok">ATTEMPTS REMAINING: 12/12</div>
+  <div id="decoupleWarning" class="crisis-banner" style="display:none;">⚠ 3 ATTEMPTS OR FEWER &mdash; CONSIDER THE OVERRIDE DECOUPLE WARNING ⚠</div>
+
+  <div class="config-row">
+    <label>Max Attempts <input type="number" id="maxAttemptsInput" value="18" min="1" max="30"></label>
+    <button id="applyConfigBtn">Apply &amp; Restart</button>
+  </div>
+
+  <div class="main-grid">
+    <div class="panel">
+      <h2>Override Dials</h2>
+      <div class="dials" id="dials"></div>
+      <div class="correct-count" id="correctCount">Last submit: --</div>
+      <button id="submitBtn">SUBMIT SEQUENCE</button>
+      <div class="hint-toggle"><button id="hintToggleBtn">Show DM Reference (position effects)</button></div>
+      <div id="hintPanel"></div>
+      <div class="log" id="logPanel"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Engine Status Dashboard</h2>
+      <div id="gauges"></div>
+      <div class="status-line">Turning dials is free and doesn't affect the gauges. Gauges only update when you SUBMIT: the closer a digit is to correct (hex distance, wrapping past F), the more its gauge drops toward optimum &mdash; the farther off in either direction, the harder it spikes. Pressure is different &mdash; it tracks attempts spent, not dial accuracy, and only ever climbs.</div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="msg">
+    <h2 id="overlayTitle"></h2>
+    <p id="overlaySub"></p>
+    <button id="overlayBtn">RESET INTERFACE</button>
+  </div>
+</div>
+
+<script>
+const DEFAULT_SOLUTION = "2C9F41A";
+let SOLUTION = DEFAULT_SOLUTION;
+const HEX = "0123456789ABCDEF";
+
+// Pressure is handled separately below — it's driven by attempts used, not by dial correctness.
+// These 6 are digit-driven, same as before, plus two new metrics (Vibration, Coolant).
+const SYSTEMS = ["Structural", "Fuel", "Vibration", "Coolant", "Traction", "Exhaust"];
+const SYS_KEY = ["structural","fuel","vibration","coolant","traction","exhaust"];
+const DISPLAY_SYSTEMS = ["Pressure", ...SYSTEMS];
+const DISPLAY_KEYS = ["pressure", ...SYS_KEY];
+
+// Deterministic "hash" of the solution: each starting digit is the solution digit
+// shifted by a fixed, unrelated-looking per-position salt (mod 16). Same code
+// always produces the same starting dials; the pattern doesn't visibly track
+// the solution, but it's not independent randomness either.
+const START_SALT = [5, 11, 2, 9, 14, 3, 8];
+function hashedStartingDigits(){
+  return SOLUTION.split("").map((ch, i) => {
+    const val = HEX.indexOf(ch);
+    const shifted = (val + START_SALT[i]) % 16;
+    return HEX[shifted];
+  });
+}
+
+// Each position drives one primary system. There are 7 positions and 6
+// systems (Brake and Governor were removed — braking is a table mechanic
+// outside this interface; this tool is purely the pre-brake stabilization
+// puzzle — and Traction/Exhaust were added so the dashboard still has depth).
+// Six into seven doesn't split evenly, so one system (Vibration) gets two
+// positions and the rest get one each. How much a position moves its system
+// is based on hex-distance-with-wraparound from the correct digit, not a
+// fixed table:
+//   - guess === correct        -> optimum, system drops
+//   - guess numerically higher (wrapping past F back to 0) -> HOT, system rises
+//   - guess numerically lower  -> COLD, system rises the other direction
+// Distance is circular across the 16 hex values (0-F), so being close either
+// direction reads as "close," not just being close from one side.
+const POSITION_SYSTEM = ["vibration", "fuel", "coolant", "structural", "traction", "exhaust", "vibration"];
+const OPTIMUM_DROP = 3;   // how much a correct digit lowers its system
+const MAX_SPIKE = 10;     // how much the worst-case (maximally off) digit raises its system
+
+// Signed circular distance from correct to guess, hex values treated as a 16-point
+// wheel (0..F, wrapping). Positive = HOT (guess reads high / overshot, wrapping
+// past F counts as continuing upward). Negative = COLD (guess reads low). Range -8..8.
+function hotColdDelta(guessDigit, correctDigit){
+  const g = HEX.indexOf(guessDigit);
+  const c = HEX.indexOf(correctDigit);
+  let diff = g - c;
+  if (diff > 8) diff -= 16;
+  if (diff < -8) diff += 16;
+  return diff; // 0 = optimum, +1..+8 = HOT by that much, -1..-8 = COLD by that much
+}
+function hotColdLabel(diff){
+  if (diff === 0) return "OPTIMUM";
+  return diff > 0 ? "HOT" : "COLD";
+}
+
+let baseMaxAttempts = 18;
+let attemptsConsumed = 0;
+let reward4Bonus = 0; // cumulative, adjusted 1 at a time via +/- buttons
+let approachActive = false; // checkbox
+let approachFieldValue = 4; // editable number added when checked
+
+function effectiveMaxAttempts(){
+  let total = baseMaxAttempts + reward4Bonus;
+  if (approachActive) total += approachFieldValue;
+  return Math.max(1, total);
+}
+function attemptsLeftNow(){
+  return Math.max(0, effectiveMaxAttempts() - attemptsConsumed);
+}
+// Pressure tracks attempts spent as a fraction of the current attempts budget,
+// so it reaches 10/10 exactly when attempts hit 0 — not a flat 1-per-attempt
+// count that caps out early on a large budget. It does not respond to
+// correct/wrong digits, only to attempts used.
+function pressureValue(){
+  const max = effectiveMaxAttempts();
+  if (max <= 0) return 10;
+  return clamp(Math.round((attemptsConsumed / max) * 10));
+}
+// re-check win/fail state after any change to attempts modifiers (reward, approach) mid-session
+function checkAttemptsState(){
+  if (gameOver && gameResult === "win") return; // never undo a win
+  if (attemptsLeftNow() <= 0){
+    if (!gameOver) showOverlay(false);
+  } else if (gameOver && gameResult === "lose"){
+    // DM granted enough attempts back to pull the crew out of failure
+    hideOverlay();
+    log("DM adjustment restored attempts — override interface reactivated.", "good");
+    renderAll();
+  }
+}
+
+let dials = hashedStartingDigits();
+let gameOver = false;
+let currentSystems = { pressure: 0, structural: 0, fuel: 0, vibration: 0, coolant: 0, traction: 0, exhaust: 0 };
+// which position(s) drive each system, for the gauge label tag (reverse of POSITION_SYSTEM)
+const PRIMARY_DIAL = {};
+POSITION_SYSTEM.forEach((sys, pos) => {
+  if (!(sys in PRIMARY_DIAL)) PRIMARY_DIAL[sys] = [];
+  PRIMARY_DIAL[sys].push(pos);
+});
+
+let prevSystems = null;
+// reward state: 3 slots, fixed left-to-right mapping to positions 0, 2, 5
+const REWARD_POSITIONS = [0, 2, 5];
+let rewards = [
+  { active: false },
+  { active: false },
+  { active: false },
+];
+
+const dialsEl = document.getElementById("dials");
+const correctCount = document.getElementById("correctCount");
+const submitBtn = document.getElementById("submitBtn");
+const attemptsBanner = document.getElementById("attemptsBanner");
+const logPanel = document.getElementById("logPanel");
+const gaugesEl = document.getElementById("gauges");
+const overlay = document.getElementById("overlay");
+const dmCodeInput = document.getElementById("dmCodeInput");
+const dmStatus = document.getElementById("dmStatus");
+const rewardListEl = document.getElementById("rewardList");
+
+function clamp(v){ return Math.max(0, Math.min(10, v)); }
+
+function revealedPositions(){
+  return rewards
+    .map((r, idx) => r.active ? REWARD_POSITIONS[idx] : null)
+    .filter(p => p !== null);
+}
+
+function computeSystems(){
+  const systems = { structural: 0, fuel: 0, vibration: 0, coolant: 0, traction: 0, exhaust: 0 };
+  const counts = { structural: 0, fuel: 0, vibration: 0, coolant: 0, traction: 0, exhaust: 0 };
+  for (let i = 0; i < SOLUTION.length; i++){
+    const sys = POSITION_SYSTEM[i];
+    const diff = hotColdDelta(dials[i], SOLUTION[i]);
+    counts[sys]++;
+    if (diff === 0){
+      systems[sys] -= OPTIMUM_DROP;
+    } else {
+      systems[sys] += Math.round((Math.abs(diff) / 8) * MAX_SPIKE);
+    }
+  }
+  // Average rather than sum: a system fed by two positions (Vibration, currently)
+  // must reflect BOTH positions' current state proportionally. Summing-then-clamping
+  // let one maxed-out position mask any improvement on the other until it hit exact
+  // match — averaging means every dial change always registers on its gauge.
+  for (const key of SYS_KEY){
+    const avg = counts[key] > 0 ? systems[key] / counts[key] : systems[key];
+    systems[key] = clamp(Math.round(avg));
+  }
+  return systems;
+}
+
+// Initial gauge state uses the exact same formula as every SUBMIT — no
+// artificial softening. This is the baseline the players actually work from,
+// and there's no jump on their first real submit since nothing changes about
+// how the numbers are computed between "before first submit" and "after."
+function computeOpeningSystems(){
+  return { pressure: pressureValue(), ...computeSystems() };
+}
+
+function recomputeSystems(){
+  prevSystems = currentSystems;
+  currentSystems = { pressure: pressureValue(), ...computeSystems() };
+}
+
+function renderDials(){
+  const revealed = revealedPositions();
+  dialsEl.innerHTML = "";
+  dials.forEach((ch, i) => {
+    const isRevealed = revealed.includes(i);
+    const d = document.createElement("div");
+    d.className = "dial";
+    d.innerHTML = `
+      <div class="dial-pos-label">POS ${i}</div>
+      <button data-i="${i}" data-dir="1" ${isRevealed ? "disabled" : ""}>&#9650;</button>
+      <div class="dial-value${isRevealed ? " revealed" : ""}">${ch}</div>
+      <button data-i="${i}" data-dir="-1" ${isRevealed ? "disabled" : ""}>&#9660;</button>
+    `;
+    dialsEl.appendChild(d);
+  });
+  dialsEl.querySelectorAll("button:not(:disabled)").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (gameOver) return;
+      const i = parseInt(btn.dataset.i, 10);
+      const dir = parseInt(btn.dataset.dir, 10);
+      let idx = HEX.indexOf(dials[i]);
+      idx = (idx + dir + 16) % 16;
+      dials[i] = HEX[idx];
+      renderDials();
+    });
+  });
+}
+
+function renderGauges(){
+  const systems = currentSystems;
+  gaugesEl.innerHTML = "";
+  DISPLAY_KEYS.forEach((key, i) => {
+    const val = systems[key];
+    let color = "#4a9060", dot = "\uD83D\uDFE2";
+    if (val >= 7) { color = "#e84b3a"; dot = "\uD83D\uDD34"; }
+    else if (val >= 4) { color = "#d4a72c"; dot = "\uD83D\uDFE1"; }
+
+    let trend = "&mdash;", trendColor = "var(--steam-dim)";
+    if (key === "pressure"){
+      trend = val > 0 ? "&#9650; BUILDING" : "&#9679; STEADY";
+      trendColor = val > 0 ? "var(--red-bright)" : "var(--steam-dim)";
+    } else if (prevSystems){
+      const diff = val - prevSystems[key];
+      if (diff > 0) { trend = "&#9650; RISING"; trendColor = "var(--red-bright)"; }
+      else if (diff < 0) { trend = "&#9660; FALLING"; trendColor = "var(--green)"; }
+      else { trend = "&#9679; STEADY"; trendColor = "var(--steam-dim)"; }
+    }
+
+    const tag = key === "pressure" ? "tied to Attempts Used" : "";
+    const row = document.createElement("div");
+    row.className = "gauge-row";
+    row.innerHTML = `
+      <div class="gauge-label">${DISPLAY_SYSTEMS[i]}${tag ? `<br><span style="opacity:0.6;font-size:0.65rem;">${tag}</span>` : ""}</div>
+      <div class="gauge-track"><div class="gauge-fill" style="width:${val*10}%;background:${color}"></div></div>
+      <div class="gauge-value">${val}/10<br><span style="color:${trendColor};font-size:0.62rem;">${trend}</span></div>
+      <div class="gauge-dot">${dot}</div>
+    `;
+    gaugesEl.appendChild(row);
+  });
+}
+
+function renderAttempts(){
+  const left = attemptsLeftNow();
+  const max = effectiveMaxAttempts();
+  attemptsBanner.textContent = `ATTEMPTS REMAINING: ${left}/${max}`;
+  attemptsBanner.className = "attempts-banner " + (left <= 3 ? "warn" : "ok");
+  const warnEl = document.getElementById("decoupleWarning");
+  warnEl.style.display = (left <= 3 && left > 0 && !gameOver) ? "block" : "none";
+}
+
+function renderLog(){
+  logPanel.innerHTML = "";
+  logEntries.slice(0, 3).forEach(entry => {
+    const line = document.createElement("div");
+    if (entry.cls) line.className = entry.cls;
+    line.textContent = entry.msg;
+    logPanel.appendChild(line);
+  });
+}
+
+function log(msg, cls){
+  logEntries.unshift({ msg, cls });
+  logEntries = logEntries.slice(0, 3);
+  renderLog();
+}
+
+function renderRewards(){
+  rewardListEl.innerHTML = "";
+  rewards.forEach((r, idx) => {
+    const pos = REWARD_POSITIONS[idx];
+    const row = document.createElement("div");
+    row.className = "reward-row";
+    row.innerHTML = `
+      <input type="checkbox" id="rewardCk${idx}" ${r.active ? "checked" : ""}>
+      <label for="rewardCk${idx}">Reward ${idx + 1} &mdash; reveals Position ${pos}</label>
+    `;
+    rewardListEl.appendChild(row);
+
+    row.querySelector(`#rewardCk${idx}`).addEventListener("change", (e) => {
+      r.active = e.target.checked;
+      applyRewardDials();
+      renderDials();
+    });
+  });
+}
+
+function renderReward4(){
+  const valEl = document.getElementById("reward4Value");
+  valEl.textContent = (reward4Bonus >= 0 ? "+" : "") + reward4Bonus + " attempts";
+}
+
+document.getElementById("reward4Up").addEventListener("click", () => {
+  reward4Bonus++;
+  renderReward4();
+  renderAttempts();
+  checkAttemptsState();
+});
+document.getElementById("reward4Down").addEventListener("click", () => {
+  reward4Bonus--;
+  renderReward4();
+  renderAttempts();
+  checkAttemptsState();
+});
+
+document.getElementById("approachCk").addEventListener("change", (e) => {
+  approachActive = e.target.checked;
+  renderAttempts();
+  checkAttemptsState();
+});
+document.getElementById("approachField").addEventListener("change", (e) => {
+  const v = parseInt(e.target.value, 10);
+  approachFieldValue = Number.isFinite(v) ? v : 0;
+  if (approachActive){ renderAttempts(); checkAttemptsState(); }
+});
+
+function applyRewardDials(){
+  // when a reward is active, snap that dial to the correct digit
+  revealedPositions().forEach(pos => {
+    dials[pos] = SOLUTION[pos];
+  });
+}
+
+let gameResult = null; // "win" | "lose" | null
+
+function showOverlay(win){
+  overlay.className = "overlay show " + (win ? "win" : "fail");
+  document.getElementById("overlayTitle").textContent = win ? "SYSTEMS STABILIZED" : "SYSTEM OVERLOAD";
+  document.getElementById("overlaySub").textContent = win
+    ? "Override accepted. Boiler pressure normalizes across all decks."
+    : "Attempts exhausted. Emergency vents trigger — brace for consequences.";
+  gameOver = true;
+  gameResult = win ? "win" : "lose";
+  submitBtn.disabled = true;
+}
+
+function hideOverlay(){
+  overlay.className = "overlay";
+  gameOver = false;
+  gameResult = null;
+  submitBtn.disabled = false;
+}
+
+function resetGame(){
+  attemptsConsumed = 0;
+  dials = hashedStartingDigits();
+  logEntries = [];
+  prevSystems = null;
+  currentSystems = { pressure: 0, structural: 0, fuel: 0, vibration: 0, coolant: 0, traction: 0, exhaust: 0 };
+  hideOverlay();
+  correctCount.textContent = "Last submit: --";
+  applyRewardDials();
+  currentSystems = computeOpeningSystems();
+  renderAll();
+}
+
+function renderAll(){
+  renderDials();
+  renderGauges();
+  renderAttempts();
+  renderLog();
+}
+
+function submit(){
+  if (gameOver) return;
+  let numCorrect = 0;
+  for (let i = 0; i < SOLUTION.length; i++){
+    if (dials[i] === SOLUTION[i]) numCorrect++;
+  }
+  const code = dials.join("");
+
+  if (numCorrect === SOLUTION.length){
+    log(`SUBMIT: ${code} — ALL SYSTEMS LOCKED.`, "good");
+    correctCount.textContent = `Last submit: ${numCorrect}/${SOLUTION.length} correct`;
+    recomputeSystems();
+    renderAll();
+    showOverlay(true);
+    return;
+  }
+
+  attemptsConsumed++;
+
+  log(`SUBMIT: ${code} — ${numCorrect}/${SOLUTION.length} correct. Pressure climbs further.`, numCorrect > 0 ? "good" : "bad");
+  correctCount.textContent = `Last submit: ${numCorrect}/${SOLUTION.length} correct`;
+  recomputeSystems();
+  renderAll();
+
+  if (attemptsLeftNow() <= 0){
+    showOverlay(false);
+  }
+}
+
+submitBtn.addEventListener("click", submit);
+document.getElementById("overlayBtn").addEventListener("click", resetGame);
+
+document.getElementById("applyConfigBtn").addEventListener("click", () => {
+  const v = parseInt(document.getElementById("maxAttemptsInput").value, 10);
+  baseMaxAttempts = (v && v > 0) ? v : 12;
+  resetGame();
+});
+
+document.getElementById("toggleVisBtn").addEventListener("click", (e) => {
+  if (dmCodeInput.type === "password"){
+    dmCodeInput.type = "text";
+    e.target.textContent = "Hide";
+  } else {
+    dmCodeInput.type = "password";
+    e.target.textContent = "Show";
+  }
+});
+
+document.getElementById("setCodeBtn").addEventListener("click", () => {
+  const raw = dmCodeInput.value.trim().toUpperCase();
+  if (raw.length !== 7 || !/^[0-9A-F]{7}$/.test(raw)){
+    dmStatus.textContent = "Invalid: enter exactly 7 hex characters (0-9, A-F).";
+    dmStatus.style.color = "var(--red-bright)";
+    return;
+  }
+  SOLUTION = raw;
+  dmStatus.textContent = `Custom code set (${raw.length} chars). Interface reset.`;
+  dmStatus.style.color = "var(--dm)";
+  // reset rewards since positions/solution changed context
+  rewards = [
+    { active: false },
+    { active: false },
+    { active: false },
+  ];
+  renderRewards();
+  resetGame();
+});
+
+document.getElementById("hintToggleBtn").addEventListener("click", () => {
+  const panel = document.getElementById("hintPanel");
+  if (!panel.classList.contains("show")){
+    let rows = "";
+    for (let i = 0; i < SOLUTION.length; i++){
+      const diff = hotColdDelta(dials[i], SOLUTION[i]);
+      const label = hotColdLabel(diff);
+      const sys = POSITION_SYSTEM[i];
+      rows += `<tr><td>${i}</td><td>${SOLUTION[i]}</td><td>${dials[i]}</td><td>${sys}</td><td>${label}${diff !== 0 ? " (" + (diff>0?"+":"") + diff + ")" : ""}</td></tr>`;
+    }
+    panel.innerHTML = `<em>DM eyes only — not shown to players in this build.</em>
+      <table>
+        <tr><th>Pos</th><th>Correct</th><th>Current</th><th>System</th><th>Hot/Cold</th></tr>
+        ${rows}
+      </table>
+      <p style="margin-top:6px;">Each position's gauge move is based on hex distance from correct, wrapping past F back to 0. Guessing higher than correct reads HOT, lower reads COLD, exact match is OPTIMUM and drops the gauge. The farther off (either direction), the bigger the spike — up to a max at 8 steps away, the furthest possible on the 16-value wheel.</p>`;
+  }
+  panel.classList.toggle("show");
+});
+
+renderRewards();
+renderReward4();
+currentSystems = computeOpeningSystems();
+renderAll();
+</script>
+</body>
+</html>
